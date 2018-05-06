@@ -1,18 +1,17 @@
 const router = require('express').Router();
-const gravatar = require('gravatar');
-const bcrypt = require('bcryptjs');
+
 //Load User model
 const User = require('../../models/User');
 
-router.route('/register').post(register);
+// router.route('/test').get(getAllUsers);
 
+// function getAllUsers(req, res) {
+//   res.json({ msg: 'hello from all users' });
+// }
+
+router.route('/register').post(register);
 function register(req, res) {
   const {name, email, password} = req.body;
-  const avatar = gravatar.url(email, {
-    s: '200',
-    r: 'pg',
-    d: 'mm'
-  });
   User.findOne({email: req.body.email})
     .then(user => {
       if (user) {
@@ -23,16 +22,6 @@ function register(req, res) {
           email,
           avatar,
           password
-        });
-        bcrypt.genSalt(10, (err, salt) => {
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw err;
-            newUser.password = hash;
-            newUser
-              .save()
-              .then(user => res.json(user))
-              .catch(err => console.log(err));
-          });
         });
       }
     })
