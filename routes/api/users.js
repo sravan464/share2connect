@@ -4,6 +4,8 @@ const bcrypt = require('bcryptjs');
 //Load User model
 const User = require('../../models/User');
 
+// @desc user registration
+// @required name , email , password
 router.route('/register').post(register);
 
 function register(req, res) {
@@ -37,6 +39,31 @@ function register(req, res) {
       }
     })
     .catch(err => logger.info(err));
+}
+
+// @desc Login User / Returning JWT Token
+router.route('/login').post(userLogin);
+
+function userLogin(req, res) {
+  const {email, password} = req.body;
+
+  // find user by email
+  User.findOne({email})
+    .then(user => {
+      if (!user) {
+        return res.status(404).json({email: 'User not found'});
+      }
+
+      //check password
+      bcrypt.compare(password, user.password).then(isMatch => {
+        if (isMatch) {
+          res.json({msg: 'success'});
+        } else {
+          return res.status(400).json({password: 'password incorrect'});
+        }
+      });
+    })
+    .catch(err => console.log(err));
 }
 
 module.exports = router;
